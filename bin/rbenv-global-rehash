@@ -1,0 +1,20 @@
+#!/bin/bash
+
+${RBENV_ROOT}/libexec/rbenv rehash || exit 1
+
+for x in ${RBENV_ROOT}/bin/*; do
+  name="${x##*/}"
+  target="$1/${name}"
+  echo "cat > ${target}"
+  cat <<EOF > "$target"
+#!/bin/sh
+export RBENV_ROOT="${RBENV_ROOT}"
+exec ${x} \$*
+EOF
+  chmod +x "$target"
+done
+
+for x in ${RBENV_ROOT}/shims/*; do
+  echo "ln -sf \"$x\" \"$1/\""
+  ln -sf "$x" "$1/"
+done
