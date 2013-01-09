@@ -1,0 +1,2 @@
+rbenv-global-rehash
+===================
