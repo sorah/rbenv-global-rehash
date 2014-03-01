@@ -8,13 +8,23 @@ for x in ${RBENV_ROOT}/bin/*; do
   echo "cat > ${target}"
   cat <<EOF > "$target"
 #!/bin/sh
+set -e
 export RBENV_ROOT="${RBENV_ROOT}"
+export PATH=${RBENV_ROOT}/bin:${RBENV_ROOT}/shims:\$PATH
 exec ${x} \$*
 EOF
   chmod +x "$target"
 done
 
 for x in ${RBENV_ROOT}/shims/*; do
-  echo "ln -sf \"$x\" \"$1/\""
-  ln -sf "$x" "$1/"
+  target="$1/${x##*/}"
+  [ -L ${target} ] && rm ${target}
+  echo "cat > ${target}"
+  cat <<EOF > "${target}"
+#!/bin/sh
+set -e
+export RBENV_ROOT="${RBENV_ROOT}"
+export PATH=${RBENV_ROOT}/bin:${RBENV_ROOT}/shims:\$PATH
+exec ${x##*/} "\$@"
+EOF
 done
